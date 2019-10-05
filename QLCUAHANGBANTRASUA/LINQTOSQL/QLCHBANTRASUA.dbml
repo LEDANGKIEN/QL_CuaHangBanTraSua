@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="DSQLTRASUA" Class="QLCHBANTRASUADataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=HOANGTHIEN\SQLEXPRESS;Initial Catalog=DSQLTRASUA;Persist Security Info=True;User ID=sa" SettingsObjectName="LINQTOSQL.Properties.Settings" SettingsPropertyName="DSQLTRASUAConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.AccountD" Member="AccountDs">
+    <Type Name="AccountD">
+      <Column Name="userName" Type="System.String" DbType="NVarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="displayName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="password" Type="System.String" DbType="Char(100)" CanBeNull="true" />
+      <Column Name="idTypeAccount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="TypeAccount_AccountD" Member="TypeAccount" ThisKey="idTypeAccount" OtherKey="idTypeAccount" Type="TypeAccount" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TypeAccount" Member="TypeAccounts">
+    <Type Name="TypeAccount">
+      <Column Name="idTypeAccount" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="nameTypeAccount" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Association Name="TypeAccount_AccountD" Member="AccountDs" ThisKey="idTypeAccount" OtherKey="idTypeAccount" Type="AccountD" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Bill" Member="Bills">
+    <Type Name="Bill">
+      <Column Name="idBill" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="idTableD" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="nmPeople" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="getIn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="getOut" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="statusBill" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="sale" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="totalPrice" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaBill" Type="System.String" DbType="NVarChar(24) NOT NULL" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="Bill_BillInfo" Member="BillInfos" ThisKey="idBill" OtherKey="idBill" Type="BillInfo" />
+      <Association Name="TableD_Bill" Member="TableD" ThisKey="idTableD" OtherKey="idTableD" Type="TableD" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.BillInfo" Member="BillInfos">
+    <Type Name="BillInfo">
+      <Column Name="idBillInfo" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="idBill" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="idDrink" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="countD" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="price" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaBill" Type="System.String" DbType="NVarChar(24) NOT NULL" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="Bill_BillInfo" Member="Bill" ThisKey="idBill" OtherKey="idBill" Type="Bill" IsForeignKey="true" />
+      <Association Name="Drink_BillInfo" Member="Drink" ThisKey="idDrink" OtherKey="idDrink" Type="Drink" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CategoriesD" Member="CategoriesDs">
+    <Type Name="CategoriesD">
+      <Column Name="idCategoriesD" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="nameCategories" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Association Name="CategoriesD_Drink" Member="Drinks" ThisKey="idCategoriesD" OtherKey="idCategoriesD" Type="Drink" />
+    </Type>
+  </Table>
+  <Table Name="dbo.cateNhanvien" Member="cateNhanviens">
+    <Type Name="cateNhanvien">
+      <Column Name="idCateNV" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="cateNhanVien" Member="cateNhanVien1" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Association Name="cateNhanvien_NhanVien" Member="NhanViens" ThisKey="idCateNV" OtherKey="idCateNV" Type="NhanVien" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Drink" Member="Drinks">
+    <Type Name="Drink">
+      <Column Name="idDrink" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="nameDrink" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="price" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="idSizeDrink" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="picture" Type="System.Data.Linq.Binary" DbType="Image" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="idCategoriesD" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="MaDrink" Type="System.String" DbType="NVarChar(17) NOT NULL" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="Drink_BillInfo" Member="BillInfos" ThisKey="idDrink" OtherKey="idDrink" Type="BillInfo" />
+      <Association Name="CategoriesD_Drink" Member="CategoriesD" ThisKey="idCategoriesD" OtherKey="idCategoriesD" Type="CategoriesD" IsForeignKey="true" />
+      <Association Name="SizeDrink_Drink" Member="SizeDrink" ThisKey="idSizeDrink" OtherKey="idSizeDrink" Type="SizeDrink" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.NgayLuong" Member="NgayLuongs">
+    <Type Name="NgayLuong">
+      <Column Name="idNgayLuong" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="idNhanVien" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ngay" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
+      <Column Name="luongNgay" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="cateL" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="NhanVien_NgayLuong" Member="NhanVien" ThisKey="idNhanVien" OtherKey="idNhanVien" Type="NhanVien" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.NhanVien" Member="NhanViens">
+    <Type Name="NhanVien">
+      <Column Name="idNhanVien" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="maNhanVien" Type="System.String" DbType="Char(10) NOT NULL" CanBeNull="false" />
+      <Column Name="tenNhanVien" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="idCateNV" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="luongUncheck" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="luongCashout" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="MaNV" Type="System.String" DbType="NVarChar(16) NOT NULL" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="NhanVien_NgayLuong" Member="NgayLuongs" ThisKey="idNhanVien" OtherKey="idNhanVien" Type="NgayLuong" />
+      <Association Name="cateNhanvien_NhanVien" Member="cateNhanvien" ThisKey="idCateNV" OtherKey="idCateNV" Type="cateNhanvien" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SizeDrink" Member="SizeDrinks">
+    <Type Name="SizeDrink">
+      <Column Name="idSizeDrink" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="nameSizeDrink" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Association Name="SizeDrink_Drink" Member="Drinks" ThisKey="idSizeDrink" OtherKey="idSizeDrink" Type="Drink" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TableD" Member="TableDs">
+    <Type Name="TableD">
+      <Column Name="idTableD" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="nameTable" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="numberPeople" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="status" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="TableD_Bill" Member="Bills" ThisKey="idTableD" OtherKey="idTableD" Type="Bill" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ThanhToan" Member="ThanhToans">
+    <Type Name="ThanhToan">
+      <Column Name="idThanhToan" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="idNhanVien" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="dateCheckout" Type="System.DateTime" DbType="Date" CanBeNull="true" />
+      <Column Name="luongCheckout" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="MaTT" Type="System.String" DbType="NVarChar(36) NOT NULL" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+    </Type>
+  </Table>
+  <Function Name="dbo.USP_AddAccountByUserName" Method="USP_AddAccountByUserName">
+    <Parameter Name="userName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="displayName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="idTypeAccount" Type="System.Int32" DbType="Int" />
+    <Parameter Name="password" Type="System.String" DbType="Char(100)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.USP_CheckLogin" Method="USP_CheckLogin">
+    <Parameter Name="useName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="password" Type="System.String" DbType="Char(100)" />
+    <ElementType Name="USP_CheckLoginResult">
+      <Column Name="userName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="displayName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="password" Type="System.String" DbType="Char(100)" CanBeNull="true" />
+      <Column Name="idTypeAccount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.USP_UpdateAccountByUserName" Method="USP_UpdateAccountByUserName">
+    <Parameter Name="userName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="displayName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="idTypeAccount" Type="System.Int32" DbType="Int" />
+    <Parameter Name="password" Type="System.String" DbType="Char(100)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.USP_UpdateAccountByUserNameNoPass" Method="USP_UpdateAccountByUserNameNoPass">
+    <Parameter Name="userName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="displayName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="idTypeAccount" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.USP_UpdateAccountByUserNameNoType" Method="USP_UpdateAccountByUserNameNoType">
+    <Parameter Name="userName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="displayName" Type="System.String" DbType="NVarChar(100)" />
+    <Parameter Name="password" Type="System.String" DbType="Char(100)" />
+    <Return Type="System.Int32" />
+  </Function>
+</Database>
