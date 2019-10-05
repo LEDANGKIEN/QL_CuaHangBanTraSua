@@ -1,0 +1,587 @@
+CREATE DATABASE DSQLTRASUA
+GO
+USE DSQLTRASUA
+GO
+--Create Table
+CREATE TABLE TypeAccount
+(
+	idTypeAccount INT IDENTITY PRIMARY KEY NOT NULL,
+	nameTypeAccount NVARCHAR(100) NOT NULL
+)
+GO
+
+CREATE TABLE AccountD
+(
+	userName NVARCHAR(100) PRIMARY KEY NOT NULL ,
+	displayName NVARCHAR(100) NOT NULL ,
+	password CHAR(100)   NULL , 
+	idTypeAccount INT NOT NULL ,
+
+	FOREIGN KEY (idTypeAccount) REFERENCES TypeAccount(idTypeAccount) 
+)
+GO
+
+CREATE TABLE TableD
+(
+	idTableD INT IDENTITY(0, 1) PRIMARY KEY NOT NULL,
+	nameTable NVARCHAR(100) NOT NULL , 
+	numberPeople INT NOT NULL DEFAULT 0,
+	status INT NOT NULL  DEFAULT 0 -- 0 là còn 1 là trống
+)
+GO
+
+CREATE TABLE CategoriesD
+(
+	idCategoriesD INT IDENTITY PRIMARY KEY NOT NULL,
+	nameCategories NVARCHAR(100) NOT NULL
+)
+GO
+
+CREATE TABLE SizeDrink
+(
+	idSizeDrink INT IDENTITY PRIMARY KEY NOT NULL,
+	nameSizeDrink NVARCHAR(100) NOT NULL
+)
+GO
+
+CREATE TABLE Drink
+(
+	idDrink INT IDENTITY PRIMARY KEY NOT NULL,
+	nameDrink NVARCHAR(100) NOT NULL, 
+	price float NOT NULL,
+	idSizeDrink INT NOT NULL,
+	picture IMAGE,
+	idCategoriesD INT NOT NULL, 
+
+	MaDrink AS CASE idCategoriesD
+			WHEN 1 THEN 
+			(IIF(idDrink  10 , ISNULL(N'TS0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'TS000' + CAST(idDrink AS CHAR(10)), 'X')))
+			WHEN 2 THEN 
+			(IIF(idDrink  10 , ISNULL(N'TD0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'TD000' + CAST(idDrink AS CHAR(10)), 'X')))
+			WHEN 3 THEN 
+			(IIF(idDrink  10 , ISNULL(N'BA0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'BA000' + CAST(idDrink AS CHAR(10)), 'X')))
+			WHEN 4 THEN 
+			(IIF(idDrink  10 , ISNULL(N'TAN0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'TAN000' + CAST(idDrink AS CHAR(10)), 'X')))
+			WHEN 5 THEN 
+			(IIF(idDrink  10 , ISNULL(N'CA0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'CA000' + CAST(idDrink AS CHAR(10)), 'X')))
+			WHEN 6 THEN 
+			(IIF(idDrink  10 , ISNULL(N'YO0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'YO000' + CAST(idDrink AS CHAR(10)), 'X')))
+			WHEN 7 THEN 
+			(IIF(idDrink  10 , ISNULL(N'SA0000' + CAST(idDrink AS CHAR(10)), 'X') , ISNULL(N'SA000' + CAST(idDrink AS CHAR(10)), 'X')))
+			ELSE ISNULL(N'K000' + CAST(idDrink AS CHAR(10)), 'X')
+	END,
+	FOREIGN KEY (idCategoriesD) REFERENCES CategoriesD(idCategoriesD) ,
+	FOREIGN KEY (idSizeDrink) REFERENCES SizeDrink(idSizeDrink) 
+)
+GO
+
+CREATE TABLE cateNhanvien
+(
+	idCateNV INT IDENTITY PRIMARY KEY,
+	cateNhanVien NVARCHAR(100) NOT NULL
+)
+GO
+
+CREATE TABLE NhanVien
+(
+	idNhanVien INT IDENTITY PRIMARY KEY,
+	maNhanVien CHAR(10) NOT NULL,
+	tenNhanVien NVARCHAR(100) NOT NULL,
+	idCateNV INT NOT NULL DEFAULT 1, -- 1 là part - time, 2 là full - time
+	luongUncheck FLOAT DEFAULT 0,
+	luongCashout FLOAT DEFAULT 0,
+	MaNV AS CASE idCateNV
+	WHEN 1 THEN 
+			ISNULL(N'PT0000' + CAST(idNhanVien AS CHAR(10)), 'X')
+			ELSE ISNULL(N'FT000' + CAST(idNhanVien AS CHAR(10)), 'X')
+			END,
+	FOREIGN KEY (idCateNV) REFERENCES cateNhanVien(idCateNV) 
+)
+GO
+
+CREATE TABLE NgayLuong
+(
+	idNgayLuong INT IDENTITY PRIMARY KEY,
+	idNhanVien INT NOT NULL,
+	ngay DATE NOT NULL DEFAULT GETDATE(),
+	luongNgay FLOAT DEFAULT 0,
+	cateL INT DEFAULT 0,
+	FOREIGN KEY (idNhanVien) REFERENCES NhanVien(idNhanVien)
+)
+GO
+
+CREATE TABLE ThanhToan
+(
+	idThanhToan INT IDENTITY PRIMARY KEY,
+	idNhanVien INT NOT NULL,
+	dateCheckout DATE DEFAULT GETDATE(),
+	luongCheckout FLOAT NOT NULL,
+	MaTT AS ISNULL(N'TT0000'  + CAST(idNhanVien AS CHAR(10)) + CAST(DATEPART(day , dateCheckout) as CHAR(10)) + CAST(idThanhToan as CHAR(10)), 'X')
+)
+GO
+
+CREATE TABLE Bill
+(
+	idBill INT IDENTITY PRIMARY KEY,
+	idTableD INT NOT NULL, -- 0 là take away
+	nmPeople INT NOT NULL,
+	getIn DATETIME NOT NULL DEFAULT GETDATE(),
+	getOut DATETIME , 
+	statusBill INT NOT NULL DEFAULT 0,
+	sale FLOAT NOT NULL DEFAULT 0,
+	totalPrice FLOAT NOT NULL DEFAULT 0, -- 0 trống 1 , có người
+	MaBill AS CASE idTableD
+			WHEN 0 THEN 
+			(IIF(idBill  10 , ISNULL(N'TK00' + CAST(idTableD AS CHAR(10)) + CAST(idBill AS CHAR(10)), 'X') , ISNULL(N'TK0'+ CAST(idTableD AS CHAR(10)) + CAST(idBill AS CHAR(10)), 'X')))
+			ELSE (IIF(idBill  10 , ISNULL(N'TB00'+ CAST(idTableD AS CHAR(10)) + CAST(idBill AS CHAR(10)), 'X') , ISNULL(N'TB0'+ CAST(idTableD AS CHAR(10)) + CAST(idBill AS CHAR(10)), 'X')))
+	END,
+	FOREIGN KEY (idTableD) REFERENCES TableD (idTableD)
+)
+GO
+
+CREATE TABLE BillInfo
+(
+	idBillInfo INT IDENTITY PRIMARY KEY, 
+	idBill INT NOT NULL,
+	idDrink INT NOT NULL,
+	countD INT NOT NULL DEFAULT 1,
+	price FLOAT NOT NULL DEFAULT 0,
+	MaBill AS CASE IIF(idBillInfo  10 , 1 ,2)
+			WHEN 1 THEN 
+				ISNULL(N'MA00' + CAST(idDrink AS CHAR(10)) + CAST(idBillInfo AS CHAR(10)), 'X')
+			ELSE ISNULL(N'BT00'+ CAST(idDrink AS CHAR(10)) + CAST(idBillInfo AS CHAR(10)), 'X')
+	END,
+	FOREIGN KEY (idBill) REFERENCES Bill (idBill) ,
+	FOREIGN KEY (idDrink) REFERENCES Drink (idDrink)
+)
+GO
+
+--INSERT Table
+
+-- Drink
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà sữa trà xanh' , 20000 , 1 , 1
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà sữa Socola' , 20000 , 1 , 1
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà Bưởi' , 20000 , 2 , 5
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà Chanh' , 20000 , 3 , 1
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà đào có đào' , 22000 , 1 , 2
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà đào không đào' , 20000 , 1 , 2
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà sữa trà xanh' , 20000 , 3 , 1
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Trà sữa Socola' , 20000 , 3 , 1
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Mì không ' , 15000 , 1 , 4
+)
+INSERT Drink
+(
+	nameDrink , price ,  idSizeDrink , idCategoriesD
+)
+VALUES
+(
+	N'Mì trộn có xúc xích' , 25000 , 2 , 5
+)
+
+GO
+
+-- Size Drink
+INSERT SizeDrink
+(
+	nameSizeDrink
+)
+VALUES
+(
+	N'Lớn'
+)
+INSERT SizeDrink
+(
+	nameSizeDrink
+)
+VALUES
+(
+	N'Vừa'
+)
+INSERT SizeDrink
+(
+	nameSizeDrink
+)
+VALUES
+(
+	N'Nhỏ'
+)
+GO
+
+-- TypeAccount
+INSERT TypeAccount
+(
+	nameTypeAccount
+)
+VALUES
+(
+	N'admin'
+)
+INSERT TypeAccount
+(
+	nameTypeAccount
+)
+VALUES
+(
+	N'user'
+)
+GO
+
+-- AccountD
+INSERT AccountD
+(
+	userName, displayName , password , idTypeAccount
+)
+VALUES
+(	N'admin', N'Nhan' , '123456' , 1)
+GO
+
+--TableD
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'Take away'
+)
+
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'1'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'2'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'3'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'4'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'5'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'6'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'7'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'8'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'9'
+)
+INSERT TableD
+(
+	nameTable
+)
+VALUES
+(
+	N'10'
+)
+GO
+
+--Categories
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Trà sữa'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Trà đào'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Trà Chanh'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Trà Bưởi'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Bánh Quy '
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Mì'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Capuchino'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Yoshake'
+)
+INSERT CategoriesD
+(
+	nameCategories
+)
+VALUES
+(
+	N'Soda'
+)
+
+GO
+ --CateNhanVien
+ INSERT cateNhanvien
+(
+	cateNhanVien
+)
+VALUES
+(
+	N'Part-Time'
+)
+INSERT cateNhanvien
+(
+	cateNhanVien
+)
+VALUES
+(
+	N'Full-Time'
+)
+GO
+--NhanVien
+INSERT NhanVien
+(
+	maNhanVien , tenNhanVien , idCateNV
+)
+VALUES
+(
+	'l001' , N'Dương Ngọc Nhẫn' , 1
+)
+INSERT NhanVien
+(
+	maNhanVien , tenNhanVien , idCateNV
+)
+VALUES
+(
+	'l002' , N'Nguyễn Thị Thu' , 1
+)
+INSERT NhanVien
+(
+	maNhanVien , tenNhanVien , idCateNV
+)
+VALUES
+(
+	'h001' , N'Dương Anh Tâm' , 2
+)
+INSERT NhanVien
+(
+	maNhanVien , tenNhanVien , idCateNV
+)
+VALUES
+(
+	'h002' , N'Trịnh Văn Sơn' , 2
+)
+INSERT NhanVien
+(
+	maNhanVien , tenNhanVien , idCateNV
+)
+VALUES
+(
+	'l003' , N'Chu Văn A' , 1
+)
+INSERT NhanVien
+(
+	maNhanVien , tenNhanVien , idCateNV
+)
+VALUES
+(
+	'h002' , N'Nguyện Thị To' , 2
+)
+GO
+
+--Create proc
+--dang nhap
+CREATE PROC USP_CheckLogin
+@useName NVARCHAR(100),
+@password CHAR(100)
+AS
+BEGIN
+	SELECT  FROM AccountD WHERE userName = @useName AND password = @password
+END
+GO
+
+CREATE PROC USP_AddAccountByUserName
+@userName NVARCHAR(100),
+@displayName NVARCHAR(100),
+@idTypeAccount INT,
+@password CHAR(100)
+AS
+BEGIN
+	INSERT AccountD
+	(
+		userName , displayName , idTypeAccount , password
+	)
+	VALUES
+	(
+		@userName , @displayName , @idTypeAccount , @password
+	)
+END
+GO
+
+CREATE PROC USP_UpdateAccountByUserNameNoPass
+@userName NVARCHAR(100) , 
+@displayName NVARCHAR(100) , 
+@idTypeAccount INT
+AS
+BEGIN
+	UPDATE AccountD
+	SET displayName = @displayName , idTypeAccount = @idTypeAccount
+	WHERE userName = @userName
+END
+GO
+
+CREATE PROC USP_UpdateAccountByUserName
+@userName NVARCHAR(100),
+@displayName NVARCHAR(100),
+@idTypeAccount INT,
+@password CHAR(100)
+AS
+BEGIN
+	UPDATE AccountD
+	SET displayName = @displayName , idTypeAccount = @idTypeAccount , password = @password
+	WHERE userName = @userName
+END
